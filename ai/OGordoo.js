@@ -67,7 +67,6 @@ const isAvailable = (pos, x = -1, y = -1) => {
   return finalDirec
 } */
 
-const checkEnemy
 
 const isAlley = (card, x, y) => {
   switch (card) {
