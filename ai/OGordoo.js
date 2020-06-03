@@ -67,28 +67,71 @@ const isAvailable = (pos, x = -1, y = -1) => {
   return finalDirec
 } */
 
+// const checkWalls = (status) =>
+// status.coords.map((c) => (isAvailable(c) ? 1 : 0))
+
+const isEndBound = () => {}
 
 const isAlley = (card, x, y) => {
   switch (card) {
     case 2:
-      return isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1)
+      while (isInBounds({ x, y })) {
+        if (!hasLateralWalls(card, x, y)) {
+          return false
+        }
+        y++
+      }
+      return true
     case 1:
-      return isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y - 1)
+      while (isInBounds({ x, y })) {
+        if (!hasLateralWalls(card, x, y)) {
+          return false
+        }
+        x++
+      }
+      return true
     case 0:
-      return isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1)
+      while (isInBounds({ x, y })) {
+        if (!hasLateralWalls(card, x, y)) {
+          return false
+        }
+        y--
+      }
+      return true
     case 3:
-      console.log(x, y, 'so', x - 1, y - 1, isAvailable('', x - 1, y - 1))
-      return isAvailable('', x - 1, y + 1) || isAvailable('', x - 1, y - 1)
+      while (isInBounds({ x, y })) {
+        if (!hasLateralWalls(card, x, y)) {
+          return false
+        }
+        x--
+      }
+      return true
+  }
+}
+const hasLateralWalls = (card, x, y) => {
+  switch (card) {
+    case 2:
+      return !(isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1))
+    case 1:
+      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y - 1))
+    case 0:
+      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1))
+    case 3:
+      return !(isAvailable('', x - 1, y + 1) || isAvailable('', x - 1, y - 1))
   }
 }
 
 const allAround = (status) => {
   let x = status.x,
     y = status.y
-  if (isAvailable(status.coords[2]) && isAlley(2, x, y)) return status.coords[2]
-  if (isAvailable(status.coords[1]) && isAlley(1, x, y)) return status.coords[1]
-  if (isAvailable(status.coords[0]) && isAlley(0, x, y)) return status.coords[0]
-  if (isAvailable(status.coords[3]) && isAlley(3, x, y)) return status.coords[3]
+  if (isAvailable(status.coords[2]) && !isAlley(2, x, y))
+    return status.coords[2]
+  if (isAvailable(status.coords[1]) && !isAlley(1, x, y))
+    return status.coords[1]
+  if (isAvailable(status.coords[0]) && !isAlley(0, x, y))
+    return status.coords[0]
+  if (isAvailable(status.coords[3]) && !isAlley(3, x, y))
+    return status.coords[3]
   console.log('MERDA')
 }
 
@@ -100,7 +143,9 @@ const allAround = (status) => {
 //   console.log('MERDA')
 //   finalDirec = firstMove(playerState)
 // } else {
-const update = (state) => allAround(state.player)
+const update = (state) => {
+  return allAround(state.player)
+}
 
 // This part of the code should be left untouch since it's initializing
 // and configuring communication of the web worker to the main page.
