@@ -39,13 +39,17 @@ const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 const checkQuad = (x, y) => (x <= 50 ? (y <= 50 ? 0 : 2) : y <= 50 ? 1 : 3)
 
-const isAvailable = (pos) => {
-  let x = pos.x,
-    y = pos.y
-  return isFree({ x, y }) && isInBounds({ x, y })
+const isAvailable = (pos, x = -1, y = -1) => {
+  if (x === y && x === -1) {
+    let x = pos.x,
+      y = pos.y
+    return isFree({ x, y }) && isInBounds({ x, y })
+  } else {
+    return isFree({ x, y }) && isInBounds({ x, y })
+  }
 }
 
-const firstMove = (playerState) => {
+/* const firstMove = (playerState) => {
   let x = playerState.x,
     y = playerState.y,
     finalDirec
@@ -61,30 +65,34 @@ const firstMove = (playerState) => {
         SIZE - x > SIZE - y ? playerState.coords[2] : playerState.coords[1]
   }
   return finalDirec
+} */
+
+const checkEnemy
+
+const isAlley = (card, x, y) => {
+  switch (card) {
+    case 2:
+      return isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1)
+    case 1:
+      return isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y - 1)
+    case 0:
+      return isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1)
+    case 3:
+      console.log(x, y, 'so', x - 1, y - 1, isAvailable('', x - 1, y - 1))
+      return isAvailable('', x - 1, y + 1) || isAvailable('', x - 1, y - 1)
+  }
 }
 
 const allAround = (status) => {
-  if (isAvailable(status.coords[2])) {
-    return status.coords[2]
-  }
-  if (isAvailable(status.coords[1])) {
-    return status.coords[1]
-  }
-  if (isAvailable(status.coords[0])) {
-    return status.coords[0]
-  }
-  if (isAvailable(status.coords[3])) {
-    return status.coords[3]
-  }
+  let x = status.x,
+    y = status.y
+  if (isAvailable(status.coords[2]) && isAlley(2, x, y)) return status.coords[2]
+  if (isAvailable(status.coords[1]) && isAlley(1, x, y)) return status.coords[1]
+  if (isAvailable(status.coords[0]) && isAlley(0, x, y)) return status.coords[0]
+  if (isAvailable(status.coords[3]) && isAlley(3, x, y)) return status.coords[3]
+  console.log('MERDA')
 }
 
-const moving = (playerState) => {
-  let finalDirec = {}
-
-  finalDirec = allAround(playerState)
-
-  return finalDirec
-}
 // if (
 //   playerState.coords.every(({ cardinal, direction, x, y }) =>
 //     cardinal === 2 ? true : isFree({ x, y })
@@ -93,9 +101,7 @@ const moving = (playerState) => {
 //   console.log('MERDA')
 //   finalDirec = firstMove(playerState)
 // } else {
-const update = (state) => {
-  return moving(state.player)
-}
+const update = (state) => allAround(state.player)
 
 // This part of the code should be left untouch since it's initializing
 // and configuring communication of the web worker to the main page.
