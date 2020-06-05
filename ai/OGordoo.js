@@ -37,7 +37,8 @@ const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 //   direction: A number between 0 and 3 that represent the direction
 //     [ 0: FORWARD, 1: RIGHT, 2: BACKWARD, 3: LEFT ]
 
-const checkQuad = (x, y) => (x <= 50 ? (y <= 50 ? 0 : 2) : y <= 50 ? 1 : 3)
+const checkQuad = (x, y, size) =>
+  x <= size / 2 ? (y <= size / 2 ? 0 : 2) : y <= size / 2 ? 1 : 3
 
 const isAvailable = (pos, x = -1, y = -1) => {
   if (x === y && x === -1) {
@@ -67,10 +68,8 @@ const isAvailable = (pos, x = -1, y = -1) => {
   return finalDirec
 } */
 
-// const checkWalls = (status) =>
-// status.coords.map((c) => (isAvailable(c) ? 1 : 0))
-
-const isEndBound = () => {}
+const checkWalls = (status) =>
+  status.coords.map((c) => (isAvailable(c) ? 1 : 0))
 
 const isAlley = (card, x, y) => {
   switch (card) {
@@ -121,18 +120,51 @@ const hasLateralWalls = (card, x, y) => {
   }
 }
 
-const allAround = (status) => {
-  let x = status.x,
-    y = status.y
-  if (isAvailable(status.coords[2]) && !isAlley(2, x, y))
-    return status.coords[2]
-  if (isAvailable(status.coords[1]) && !isAlley(1, x, y))
+const goRight = (status) => {
+  if (isAvailable(status.coords[1]) && !isAlley(1, status.x, status.y))
     return status.coords[1]
-  if (isAvailable(status.coords[0]) && !isAlley(0, x, y))
-    return status.coords[0]
-  if (isAvailable(status.coords[3]) && !isAlley(3, x, y))
+}
+const goLeft = (status) => {
+  if (isAvailable(status.coords[3]) && !isAlley(3, status.x, status.y))
     return status.coords[3]
-  console.log('MERDA')
+}
+const goUp = (status) => {
+  if (isAvailable(status.coords[0]) && !isAlley(0, status.x, status.y))
+    return status.coords[0]
+}
+const goDown = (status) => {
+  if (isAvailable(status.coords[2]) && !isAlley(2, status.x, status.y))
+    return status.coords[2]
+}
+
+const walk = (status) => {
+  let walls = checkWalls(status)
+  if (walls.every((c) => c === 1)) {
+    return goDown(status)
+  }
+  if (walls.filter((c) => c === 1).length === 1) {
+    return status.coords[walls.indexOf(1)]
+  }
+  if (walls.toString() === [0, 1, 1, 1].toString())
+    return goDown(status) || goRight(status) || goLeft(status)
+  if (walls.toString() === [1, 0, 1, 1].toString())
+    return goDown(status) || goUp(status) || goLeft(status)
+  if (walls.toString() === [1, 1, 0, 1].toString())
+    return goRight(status) || goUp(status) || goLeft(status)
+  if (walls.toString() === [1, 1, 1, 0].toString())
+    return goDown(status) || goRight(status) || goUp(status)
+  if (walls.toString() === [0, 0, 1, 1].toString())
+    return goLeft(status) || goDown(status)
+  if (walls.toString() === [0, 1, 0, 1].toString())
+    return goRight(status) || goLeft(status)
+  if (walls.toString() === [0, 1, 1, 0].toString())
+    return goDown(status) || goRight(status)
+  if (walls.toString() === [1, 1, 0, 0].toString())
+    return goRight(status) || goUp(status)
+  if (walls.toString() === [1, 0, 0, 1].toString())
+    return goUp(status) || goLeft(status)
+  if (walls.toString() === [1, 0, 1, 0].toString())
+    return goDown(status) || goUp(status)
 }
 
 // if (
@@ -144,7 +176,7 @@ const allAround = (status) => {
 //   finalDirec = firstMove(playerState)
 // } else {
 const update = (state) => {
-  return allAround(state.player)
+  return walk(state.player)
 }
 
 // This part of the code should be left untouch since it's initializing
