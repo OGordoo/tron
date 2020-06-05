@@ -167,17 +167,23 @@ const walk = (status) => {
         res = goUp(status.player)
       }
     }
-    if (!isAvailable(res)) {
-      return status.player.coords[status.players[0].cardinal]
-    }
-  }
-  return res
-    ? res
-    : goUp(status.player) ||
+    if (res) {
+      if (!isAvailable(res)) {
+        if (isAvailable(status.player.coords[status.players[0].cardinal])) {
+          return status.player.coords[status.players[0].cardinal]
+        }
+      } else {
+        return res
+      }
+    } else {
+      return (
+        goUp(status.player) ||
         goRight(status.player) ||
         goDown(status.player) ||
         goLeft(status.player)
-  console.log(xPla - xOpo, yPla - yOpo)
+      )
+    }
+  }
 }
 
 // if (
@@ -189,8 +195,6 @@ const walk = (status) => {
 //   finalDirec = firstMove(playerState)
 // } else {
 const update = (state) => {
-  // console.log(state)
-
   return walk(state)
 }
 
