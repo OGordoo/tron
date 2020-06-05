@@ -37,8 +37,7 @@ const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 //   direction: A number between 0 and 3 that represent the direction
 //     [ 0: FORWARD, 1: RIGHT, 2: BACKWARD, 3: LEFT ]
 
-const checkQuad = (x, y, size) =>
-  x <= size / 2 ? (y <= size / 2 ? 0 : 2) : y <= size / 2 ? 1 : 3
+// const checkQuad = (x, y) => (x <= 50 ? (y <= 50 ? 0 : 2) : y <= 50 ? 1 : 3)
 
 const isAvailable = (pos, x = -1, y = -1) => {
   if (x === y && x === -1) {
@@ -112,7 +111,7 @@ const hasLateralWalls = (card, x, y) => {
     case 2:
       return !(isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1))
     case 1:
-      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y - 1))
+      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y + 1))
     case 0:
       return !(isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1))
     case 3:
@@ -137,34 +136,48 @@ const goDown = (status) => {
     return status.coords[2]
 }
 
+const findEnemy = (status) => {
+  return status.players.filter((p) => status.player.name !== p.name)[0]
+}
+
 const walk = (status) => {
-  let walls = checkWalls(status)
-  if (walls.every((c) => c === 1)) {
-    return goDown(status)
+  let res
+  let enemy = findEnemy(status)
+  if (status.players.length !== 1) {
+    let xPla = status.player.x,
+      yPla = status.player.y,
+      xOpo = enemy.x,
+      yOpo = enemy.y,
+      xDif = xPla - xOpo,
+      yDif = yPla - yOpo
+    // console.log(status.player.name, 'Player', xPla, yPla, 'Oponnent:', xOpo, yOpo)
+
+    if (Math.abs(xDif) > Math.abs(yDif)) {
+      if (xPla < xOpo) {
+        res = goRight(status.player)
+      } else {
+        res = goLeft(status.player)
+      }
+    }
+
+    if (!res) {
+      if (yPla < yOpo) {
+        res = goDown(status.player)
+      } else {
+        res = goUp(status.player)
+      }
+    }
+    if (!isAvailable(res)) {
+      return status.player.coords[status.players[0].cardinal]
+    }
   }
-  if (walls.filter((c) => c === 1).length === 1) {
-    return status.coords[walls.indexOf(1)]
-  }
-  if (walls.toString() === [0, 1, 1, 1].toString())
-    return goDown(status) || goRight(status) || goLeft(status)
-  if (walls.toString() === [1, 0, 1, 1].toString())
-    return goDown(status) || goUp(status) || goLeft(status)
-  if (walls.toString() === [1, 1, 0, 1].toString())
-    return goRight(status) || goUp(status) || goLeft(status)
-  if (walls.toString() === [1, 1, 1, 0].toString())
-    return goDown(status) || goRight(status) || goUp(status)
-  if (walls.toString() === [0, 0, 1, 1].toString())
-    return goLeft(status) || goDown(status)
-  if (walls.toString() === [0, 1, 0, 1].toString())
-    return goRight(status) || goLeft(status)
-  if (walls.toString() === [0, 1, 1, 0].toString())
-    return goDown(status) || goRight(status)
-  if (walls.toString() === [1, 1, 0, 0].toString())
-    return goRight(status) || goUp(status)
-  if (walls.toString() === [1, 0, 0, 1].toString())
-    return goUp(status) || goLeft(status)
-  if (walls.toString() === [1, 0, 1, 0].toString())
-    return goDown(status) || goUp(status)
+  return res
+    ? res
+    : goUp(status.player) ||
+        goRight(status.player) ||
+        goDown(status.player) ||
+        goLeft(status.player)
+  console.log(xPla - xOpo, yPla - yOpo)
 }
 
 // if (
@@ -176,7 +189,9 @@ const walk = (status) => {
 //   finalDirec = firstMove(playerState)
 // } else {
 const update = (state) => {
-  return walk(state.player)
+  // console.log(state)
+
+  return walk(state)
 }
 
 // This part of the code should be left untouch since it's initializing
