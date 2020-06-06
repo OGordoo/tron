@@ -72,12 +72,12 @@ const checkWalls = (status) =>
 
 const isAlley = (card, x, y) => {
   switch (card) {
-    case 2:
+    case 0:
       while (isInBounds({ x, y })) {
         if (!hasLateralWalls(card, x, y)) {
           return false
         }
-        y++
+        y--
       }
       return true
     case 1:
@@ -88,12 +88,12 @@ const isAlley = (card, x, y) => {
         x++
       }
       return true
-    case 0:
+    case 2:
       while (isInBounds({ x, y })) {
         if (!hasLateralWalls(card, x, y)) {
           return false
         }
-        y--
+        y++
       }
       return true
     case 3:
@@ -108,32 +108,36 @@ const isAlley = (card, x, y) => {
 }
 const hasLateralWalls = (card, x, y) => {
   switch (card) {
-    case 2:
-      return !(isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1))
-    case 1:
-      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y + 1))
     case 0:
       return !(isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1))
+    case 1:
+      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y + 1))
+    case 2:
+      return !(isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1))
     case 3:
-      return !(isAvailable('', x - 1, y + 1) || isAvailable('', x - 1, y - 1))
+      return !(isAvailable('', x - 1, y - 1) || isAvailable('', x - 1, y + 1))
   }
 }
 
-const goRight = (status) => {
-  if (isAvailable(status.coords[1]) && !isAlley(1, status.x, status.y))
-    return status.coords[1]
-}
-const goLeft = (status) => {
-  if (isAvailable(status.coords[3]) && !isAlley(3, status.x, status.y))
-    return status.coords[3]
-}
 const goUp = (status) => {
+  // console.log('goUp', isAlley(0, status.x, status.y))
   if (isAvailable(status.coords[0]) && !isAlley(0, status.x, status.y))
     return status.coords[0]
 }
+const goRight = (status) => {
+  // console.log('goRight', isAlley(1, status.x, status.y))
+  if (isAvailable(status.coords[1]) && !isAlley(1, status.x, status.y))
+    return status.coords[1]
+}
 const goDown = (status) => {
+  // console.log('goDown', isAlley(2, status.x, status.y))
   if (isAvailable(status.coords[2]) && !isAlley(2, status.x, status.y))
     return status.coords[2]
+}
+const goLeft = (status) => {
+  // console.log('goLeft', isAlley(3, status.x, status.y))
+  if (isAvailable(status.coords[3]) && !isAlley(3, status.x, status.y))
+    return status.coords[3]
 }
 
 const findEnemy = (status) => {
@@ -150,7 +154,6 @@ const walk = (status) => {
       yOpo = enemy.y,
       xDif = xPla - xOpo,
       yDif = yPla - yOpo
-    // console.log(status.player.name, 'Player', xPla, yPla, 'Oponnent:', xOpo, yOpo)
 
     if (Math.abs(xDif) > Math.abs(yDif)) {
       if (xPla < xOpo) {
@@ -167,23 +170,15 @@ const walk = (status) => {
         res = goUp(status.player)
       }
     }
-    if (res) {
-      if (!isAvailable(res)) {
-        if (isAvailable(status.player.coords[status.players[0].cardinal])) {
-          return status.player.coords[status.players[0].cardinal]
-        }
-      } else {
-        return res
-      }
-    } else {
-      return (
-        goUp(status.player) ||
-        goRight(status.player) ||
-        goDown(status.player) ||
-        goLeft(status.player)
-      )
-    }
   }
+
+  return (
+    res ||
+    goUp(status.player) ||
+    goRight(status.player) ||
+    goDown(status.player) ||
+    goLeft(status.player)
+  )
 }
 
 // if (
@@ -191,7 +186,6 @@ const walk = (status) => {
 //     cardinal === 2 ? true : isFree({ x, y })
 //   )
 // ) {
-//   console.log('MERDA')
 //   finalDirec = firstMove(playerState)
 // } else {
 const update = (state) => {
