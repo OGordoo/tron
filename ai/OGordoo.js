@@ -158,13 +158,7 @@ const findEnemy = (status) => {
 
 const walk = (status) => {
   let res
-  return (
-    goDirection(status.player, 0) ||
-    goDirection(status.player, 1) ||
-    goDirection(status.player, 2) ||
-    goDirection(status.player, 3)
-  )
-  /*   let enemy = findEnemy(status)
+  let enemy = findEnemy(status)
   if (status.players.length !== 1) {
     let xPla = status.player.x,
       yPla = status.player.y,
@@ -188,7 +182,15 @@ const walk = (status) => {
         res = goDirection(status.player, 0)
       }
     }
-  } */
+  }
+
+  return (
+    res ||
+    goDirection(status.player, 0) ||
+    goDirection(status.player, 1) ||
+    goDirection(status.player, 2) ||
+    goDirection(status.player, 3)
+  )
 }
 
 // if (
