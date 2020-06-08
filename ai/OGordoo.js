@@ -92,9 +92,9 @@ const isAlley = (card, x, y) => {
         !isAvailable('', x + 1, y + 1) &&
         !isAvailable('', x + 1, y - 1)
       ) {
-        while (isAvailable('', x + 1, y) && !hasLateralWalls(0, x, y)) {
+        while (isAvailable('', x + 1, y) && !hasLateralWalls(1, x, y)) {
           x++
-          if (hasLateralWalls(0, x, y)) {
+          if (hasLateralWalls(1, x, y)) {
             return true
           }
         }
@@ -106,9 +106,9 @@ const isAlley = (card, x, y) => {
         !isAvailable('', x + 1, y + 1) &&
         !isAvailable('', x - 1, y + 1)
       ) {
-        while (isAvailable('', x, y + 1) && !hasLateralWalls(0, x, y)) {
+        while (isAvailable('', x, y + 1) && !hasLateralWalls(2, x, y)) {
           y++
-          if (hasLateralWalls(0, x, y)) {
+          if (hasLateralWalls(2, x, y)) {
             return true
           }
         }
@@ -120,9 +120,9 @@ const isAlley = (card, x, y) => {
         !isAvailable('', x - 1, y + 1) &&
         !isAvailable('', x - 1, y - 1)
       ) {
-        while (isAvailable('', x - 1, y) && !hasLateralWalls(0, x, y)) {
+        while (isAvailable('', x - 1, y) && !hasLateralWalls(3, x, y)) {
           x--
-          if (hasLateralWalls(0, x, y)) {
+          if (hasLateralWalls(3, x, y)) {
             return true
           }
         }
@@ -139,11 +139,23 @@ const hasLateralWalls = (card, x, y) => {
         isAvailable('', x, y - 1)
       )
     case 1:
-      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y + 1))
+      return !(
+        isAvailable('', x, y - 1) ||
+        isAvailable('', x, y + 1) ||
+        isAvailable('', x + 1, y)
+      )
     case 2:
-      return !(isAvailable('', x + 1, y + 1) || isAvailable('', x - 1, y + 1))
+      return !(
+        isAvailable('', x + 1, y) ||
+        isAvailable('', x - 1, y) ||
+        isAvailable('', x, y + 1)
+      )
     case 3:
-      return !(isAvailable('', x - 1, y - 1) || isAvailable('', x - 1, y + 1))
+      return !(
+        isAvailable('', x , y - 1) ||
+        isAvailable('', x , y + 1) ||
+        isAvailable('', x - 1, y)
+      )
   }
 }
 
