@@ -73,43 +73,71 @@ const checkWalls = (status) =>
 const isAlley = (card, x, y) => {
   switch (card) {
     case 0:
-      while (isInBounds({ x, y })) {
-        if (!hasLateralWalls(card, x, y)) {
-          return false
+      if (
+        isAvailable('', x, y - 1) &&
+        !isAvailable('', x + 1, y - 1) &&
+        !isAvailable('', x - 1, y - 1)
+      ) {
+        while (isAvailable('', x, y - 1) && !hasLateralWalls(0, x, y)) {
+          y--
+          if (hasLateralWalls(0, x, y)) {
+            return true
+          }
         }
-        y--
       }
-      return true
+      return false
     case 1:
-      while (isInBounds({ x, y })) {
-        if (!hasLateralWalls(card, x, y)) {
-          return false
+      if (
+        isAvailable('', x + 1, y) &&
+        !isAvailable('', x + 1, y + 1) &&
+        !isAvailable('', x + 1, y - 1)
+      ) {
+        while (isAvailable('', x + 1, y) && !hasLateralWalls(0, x, y)) {
+          x++
+          if (hasLateralWalls(0, x, y)) {
+            return true
+          }
         }
-        x++
       }
-      return true
+      return false
     case 2:
-      while (isInBounds({ x, y })) {
-        if (!hasLateralWalls(card, x, y)) {
-          return false
+      if (
+        isAvailable('', x, y + 1) &&
+        !isAvailable('', x + 1, y + 1) &&
+        !isAvailable('', x - 1, y + 1)
+      ) {
+        while (isAvailable('', x, y + 1) && !hasLateralWalls(0, x, y)) {
+          y++
+          if (hasLateralWalls(0, x, y)) {
+            return true
+          }
         }
-        y++
       }
-      return true
+      return false
     case 3:
-      while (isInBounds({ x, y })) {
-        if (!hasLateralWalls(card, x, y)) {
-          return false
+      if (
+        isAvailable('', x - 1, y) &&
+        !isAvailable('', x - 1, y + 1) &&
+        !isAvailable('', x - 1, y - 1)
+      ) {
+        while (isAvailable('', x - 1, y) && !hasLateralWalls(0, x, y)) {
+          x--
+          if (hasLateralWalls(0, x, y)) {
+            return true
+          }
         }
-        x--
       }
-      return true
+      return false
   }
 }
 const hasLateralWalls = (card, x, y) => {
   switch (card) {
     case 0:
-      return !(isAvailable('', x + 1, y - 1) || isAvailable('', x - 1, y - 1))
+      return !(
+        isAvailable('', x + 1, y) ||
+        isAvailable('', x - 1, y) ||
+        isAvailable('', x, y - 1)
+      )
     case 1:
       return !(isAvailable('', x + 1, y - 1) || isAvailable('', x + 1, y + 1))
     case 2:
@@ -119,25 +147,9 @@ const hasLateralWalls = (card, x, y) => {
   }
 }
 
-const goUp = (status) => {
-  // console.log('goUp', isAlley(0, status.x, status.y))
-  if (isAvailable(status.coords[0]) && !isAlley(0, status.x, status.y))
-    return status.coords[0]
-}
-const goRight = (status) => {
-  // console.log('goRight', isAlley(1, status.x, status.y))
-  if (isAvailable(status.coords[1]) && !isAlley(1, status.x, status.y))
-    return status.coords[1]
-}
-const goDown = (status) => {
-  // console.log('goDown', isAlley(2, status.x, status.y))
-  if (isAvailable(status.coords[2]) && !isAlley(2, status.x, status.y))
-    return status.coords[2]
-}
-const goLeft = (status) => {
-  // console.log('goLeft', isAlley(3, status.x, status.y))
-  if (isAvailable(status.coords[3]) && !isAlley(3, status.x, status.y))
-    return status.coords[3]
+const goDirection = (status, card) => {
+  if (isAvailable(status.coords[card]) && !isAlley(card, status.x, status.y))
+    return status.coords[card]
 }
 
 const findEnemy = (status) => {
@@ -146,7 +158,13 @@ const findEnemy = (status) => {
 
 const walk = (status) => {
   let res
-  let enemy = findEnemy(status)
+  return (
+    goDirection(status.player, 0) ||
+    goDirection(status.player, 1) ||
+    goDirection(status.player, 2) ||
+    goDirection(status.player, 3)
+  )
+  /*   let enemy = findEnemy(status)
   if (status.players.length !== 1) {
     let xPla = status.player.x,
       yPla = status.player.y,
@@ -157,28 +175,20 @@ const walk = (status) => {
 
     if (Math.abs(xDif) > Math.abs(yDif)) {
       if (xPla < xOpo) {
-        res = goRight(status.player)
+        res = goDirection(status.player, 1)
       } else {
-        res = goLeft(status.player)
+        res = goDirection(status.player, 3)
       }
     }
 
     if (!res) {
       if (yPla < yOpo) {
-        res = goDown(status.player)
+        res = goDirection(status.player, 2)
       } else {
-        res = goUp(status.player)
+        res = goDirection(status.player, 0)
       }
     }
-  }
-
-  return (
-    res ||
-    goUp(status.player) ||
-    goRight(status.player) ||
-    goDown(status.player) ||
-    goLeft(status.player)
-  )
+  } */
 }
 
 // if (
